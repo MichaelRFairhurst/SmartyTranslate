@@ -1,0 +1,31 @@
+<html>
+<body>
+<h1>Caveats on the smarty parser</h1>
+<h2>Line numbers</h2>
+<p>It does know the line number of a parse error, and more or less the position. If somebody knows how to highlight it in the
+textarea that would be fantastic.</p>
+<h2>->Endless loop on widget</h2>
+<p>If a page ends with {/widget} with no space or newline, it loops indefinitely. May affect other tags. Just add a space.</p>
+<h2>->Reserved strings and some function calls</h2>
+<p>First off, it doesn't like keywords like null. I just add a $ so it parses it like a variable, and fix it later. Also, there
+are a few allowable calls such as empty() that I hadn't accounted for.</p>
+<h2>->Strings and variables</h2>
+<p>By dumb luck, embedding "$variables in strings" works. However, I do not know if smarty allows this in single quotes, in which
+case our luck will have run out. </p>
+<p>Some tags parameters have optional value quoting...ok, let me step back. {widget type=pane} is as valid as {widget type='pane'},
+I did not design the parser to keep track of how it parsed this value. So after parsing it, it quotes it without any metadata.</p>
+<p>You may or may not have seen smarty using backticks to embed variables in strings, "menu/`$menu`" for instance. This has worked
+out to be really annoying with the quoted parameter values, be prepared to fix '$admin . "/path"' because the quoter doesn't
+reallize that it functions as a string. A fix is probably a waste of time but if you fix it I will thank you.</p>
+<h2>->Wierd function syntax</h2>
+<p>The biggest one I noticed here is the implementation of concatenation as a function that is infinitely repeatable. My parser
+will yell at you if you attempt to do multiple functions in one tag.</p>
+<p>Also I didn't think to make the variable parser store the elements in a highly manipulatable state. This might be a good
+thing to do: instead of parsing and building a parsed string, it should create a data set of some sort, so that when we get a 
+function such as 'cat', we can tell the parser to return $main . '.' . $args[0]; At the moment, it holds main and args as
+comma separated values.</p>
+<h2>->Parameters in method calls</h2>
+<p>{$user->getCreated()} is handled just fine, but {$user->getCreated('Y-m-d')} will not be handled. I have yet to look into
+how hard this would be to implement.</p>
+</body>
+</html>
