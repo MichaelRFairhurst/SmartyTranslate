@@ -3,7 +3,7 @@
 class Decompiler {
 	
 	private $version = "Converted from Smarty-2.6.13 to PHP 5.3 by
-		SmartyTranslate v0.2.0 (created for this project)";
+		SmartyTranslate v0.2.2 (created for this project)";
 	
 	private $stream;
 	private $stack = array('');
@@ -226,7 +226,7 @@ class Decompiler {
 				
 			case '/widget':
 				$this->stream->moveToWhitespace();
-				return '<?php Stools::widget_end(); ?>';
+				return '<?php STools::widget_end(); ?>';
 				
 			case 'include':
 				$this->stream->moveToWhitespace();
@@ -236,7 +236,7 @@ class Decompiler {
 				$url = str_replace(".tpl", ".php", $url, &$count); 
 				if($count > 1) throw new Exception("Couldn't clean .tpl reference");
 				$vars = $this->printAnonymousDataArray($data, array('tpl', 'file'));
-				return '<?php Stools::ViewInclude(' . $url . ', ' . ($vars !== 'null' ? 'array_merge(get_defined_vars(), ' . $vars . ')' : 'get_defined_vars()') . ') ?>';
+				return '<?php $this->load->view(' . $url . ', ' . ($vars !== 'null' ? 'array_merge(get_defined_vars(), ' . $vars . ')' : 'get_defined_vars()') . ') ?>';
 				
 			case 'include_js':
 				$this->stream->moveToWhitespace();
@@ -244,7 +244,7 @@ class Decompiler {
 				$this->expectParams($data, array(), array('tpl', 'file'));
 				$url = $this->quote(@$data['tpl'] ? @$data['tpl'] : @$data['file']);
 				if(!$url) throw new Exception('No url for include');
-				return '<?php echo Stools::IncludeJS(' . $url . ') ?>';
+				return '<?php echo STools::IncludeJS(' . $url . ') ?>';
 				
 			case 'include_css':
 				$this->stream->moveToWhitespace();
@@ -252,7 +252,7 @@ class Decompiler {
 				$this->expectParams($data, array(), array('tpl', 'file', 'media'));
 				$url = $this->quote(@$data['tpl'] ? @$data['tpl'] : @$data['file']);
 				if(!$url) throw new Exception('No url for include');
-				return '<?php echo Stools::IncludeCSS(' . $url . (@$data['media'] ? ', ' . $data['media'] : '') . ') ?>';
+				return '<?php echo STools::IncludeCSS(' . $url . (@$data['media'] ? ', ' . $data['media'] : '') . ') ?>';
 				
 			default:
 				throw new Exception('Unrecognized smarty tag: ' . $tag);
