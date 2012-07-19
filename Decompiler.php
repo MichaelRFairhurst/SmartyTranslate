@@ -618,7 +618,10 @@ class Decompiler {
 
 			case 'is_a':
 				throw new Exception($elements['funcname'] . ' has not been implemented. We can either do it manually, add to the compiler, or write a Stool.');
-			
+		
+			case 'default':
+				return '(' . $return . ') ? ' . $return . ' : ' . $elements['arguments'][0] . ')';
+	
 			case 'f':
 			case 'func':
 				echo "test func called, ";
