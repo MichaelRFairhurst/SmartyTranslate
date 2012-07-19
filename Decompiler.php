@@ -477,9 +477,16 @@ class Decompiler {
 		$met_indexdot = false;		// $var.
 		$met_dashrocket = false;	// $var->method()
 		$met_funcpipe = false;		// $var|
-		$funcname = '';				// We'll check if its a smarty function
-		$return = '';
-		
+	
+		$elements = array(
+			'main' => '',
+			'funcname' => '',
+			'method' => '',
+			'index' => '',
+			'methodparam' => '',
+			'arguments' => array(),
+		);
+	
 		do {
 			if($this->stream->readAhead(8) == '$smarty.') {
 				return $this->cleanSmartyVar();
@@ -489,17 +496,16 @@ class Decompiler {
 			if(!$met_dollarsign) {
 				if($this->stream->expectChar('$')) {
 					$met_dollarsign = true;
-					$return .= '$';
 				}
 			} else
 			
 			// Must have text for a base name, funcname, etc
-			if(!$met_text) { //TODO: smarty var detection and superglobal detection
+			if(!$met_text) {
 				if($this->stream->expectAlph()) {
 					$text = $this->stream->getNextWord();
 					$met_text = true;
 					if($met_dashrocket == 1) {
-						$return .= $text;
+						$elements['method'] = $text;
 						if($this->stream->readCharAhead(1) == '(') {
 							$this->stream->moveChar();
 							$this->stream->moveChar();
