@@ -484,6 +484,7 @@ class Decompiler {
 			'method' => '',
 			'index' => '',
 			'methodparam' => '',
+			'methodparens' => false,
 			'arguments' => array(),
 		);
 	
@@ -507,26 +508,23 @@ class Decompiler {
 					if($met_dashrocket == 1) {
 						$elements['method'] = $text;
 						if($this->stream->readCharAhead(1) == '(') {
+							$elements['methodparens'] = true;
 							$this->stream->moveChar();
 							$this->stream->moveChar();
-							$return .= '(';
 							if($this->stream->getChar() !== ')') {
-								$return .= $this->cleanArgument();
+								$elements['methodparam'] = $this->cleanArgument();
 							}
 							$this->stream->expectChar(')');
-							$return .= ')';
-						} else {
-							$return = '@' . $return;
 						}
 						$met_dashrocket = 2;
 					} else if($met_indexdot == 1) {
-						$return .= $text . '\']';
+						$elements['index'] = $text;
 						$met_indexdot = 2;
 					} else if($met_funcpipe == 1) {
-						$funcname = $text;
+						$elements['funcname'] = $text;
 						$met_funcpipe = 2;
 					} else {
-						$return .= $text;
+						$elements['main'] = $text;
 					}
 				}
 			} else
@@ -543,10 +541,8 @@ class Decompiler {
 							$this->stream->expectChar('>');
 							$met_dashrocket = true;
 							$met_text = false;
-							$return .= '->';
 							break;
 						case '.':
-							$return .= '[\'';
 							$met_indexdot = true;
 							$met_text = false;
 							break;
@@ -564,11 +560,10 @@ class Decompiler {
 			} else if($met_funcpipe) {
 				// the loop would terminate if we weren't expecting another element
 				$this->stream->expectChar(':');
-				$return .= ', ';
 				$this->stream->moveChar();
 				
 				//use recursion for args
-				$return .= $this->cleanArgument();
+				$elements['arguments'][] = $this->cleanArgument();
 				$this->stream->moveBack(); 
 				// the while loop pushes us forward after cleanArgument, and then
 				// our while loop increments again. Big eww, but it beats
@@ -585,29 +580,53 @@ class Decompiler {
 				break;
 			}
 		} while(true);
-		
-		if(!$met_dashrocket) $return = '@' . $return;
-		
+
+		if(strtolower($elements['main']) == 'user') {
+			$is_user = true;
+			$return = 'Application::getUser()';
+		} else {
+			$is_user = false;
+			$return = '$' . $elements['main'];
+		}
+
+		if($elements['index']) $return .= '[\'' . $elements['index'] . '\']';
+		if($elements['method']) {
+			 $return .= '->' . $elements['method'];
+			if($elements['methodparens']) $return .= '(' . $elements['methodparam'] . ')';
+			elseif(!$is_user) $return = '@' . $return;
+		} elseif(!$is_user) {
+			$return = '@' . $return;
+		}
+
+		if($is_user) {
+			if($elements['index']) throw new Exception('Why is user an array?');
+			if($elements['method'] == 'getType') $return = 'Application::getUserType()';
+			if($elements['method'] == 'getUserID') $return = 'Application::getUserID()';
+		}
+
 		//Clean up smarty's functions
-		switch ($funcname) {
+		switch ($elements['funcname']) {
 			case '':
 				return $return;
+
 			case 'cat':
-			case 'is_a':
+				if(count($elements['arguments']) > 1) throw new Exception("Only expected one argument to cat");
+				return $return . ' . ' . $elements['arguments'][0];
+
 			case 'replace':
-				throw new Exception($funcname . ' has not been implemented. We can either do it manually, add to the compiler, or write a Stool. BYPASS will allow compile.');
+				return 'str_replace(' . $elements['arguments'][0] . ', ' . $elements['arguments']['1'] . ', ' . $return . ')';
+
+			case 'is_a':
+				throw new Exception($elements['funcname'] . ' has not been implemented. We can either do it manually, add to the compiler, or write a Stool.');
 			
 			case 'f':
 			case 'func':
 				echo "test func called, ";
+				return $elements['funcname'] . '(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
 
-			case 'BYPASS':
-				echo "bypassing function...";
-				return $funcname . '(' . $return . ')';
-				
 			default:
-				if(!function_exists($funcname)) throw new Exception($funcname . ' probably isn\'t a PHP function. Add to compiler and/or write a Stool. BYPASS will allow compile.');
-				return $funcname . '(' . $return . ')';
+				if(!function_exists($elements['funcname'])) throw new Exception($elements['funcname'] . ' probably isn\'t a PHP function. Add to compiler and/or write a Stool.');
+				return $elements['funcname'] . '(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
 		}
 		
 		return $return;

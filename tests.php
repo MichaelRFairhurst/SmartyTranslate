@@ -41,7 +41,10 @@ $function_bases = array('$test' => '@$test',
                         '$test.i' => '@$test[\'i\']',
                         '$test->m' => '@$test->m',
                         '$test->meem' => '@$test->meem',
-                        '$test->meem()' => '$test->meem()');
+                        '$test->meem()' => '$test->meem()',
+			'$user' => 'Application::getUser()',
+			'$user->getUserID()' => 'Application::getUserID()',
+			'$user->getType()' => 'Application::getUserType()');
 $function_vars = array(	'"string"' => '"string"',
 			'"t"' => '"t"',
 			'1234' => '1234',
