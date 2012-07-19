@@ -41,6 +41,10 @@ class Stream {
 	function getPos() {
 		return 'At line ' . $this->line . ', pos ' . $this->pos . ': ';
 	}
+
+	function getLine() {
+		return $this->line;
+	}
 	
 	/**
 	 * Are we at the end of the stream/file?

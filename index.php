@@ -3,6 +3,8 @@
 include('Stream.php');
 include('Decompiler.php');
 
+$line = 0;
+
 if(@$_REQUEST['content']) {
 	$st = new Stream($_REQUEST['content']);
 
@@ -19,6 +21,7 @@ if(@$_REQUEST['content']) {
 
 		$content = $_REQUEST['content'];
 		$error = $st->getPos() . $e->getMessage();
+		$line = $st->getLine();
 	}
 }
 
@@ -28,8 +31,21 @@ if(@$_REQUEST['content']) {
 	<body>
 		<?= isset($error) ? $error . '<br />' : '' ?>
 		<form method="POST">
-			<textarea rows='48' cols='170' name="content"><?=@htmlspecialchars($content)?></textarea>
+			<textarea rows='48' cols='170' id='content' name="content"><?=@htmlspecialchars($content)?></textarea>
 			<input type="submit" />
 		</form>
+		<script>
+				text = document.getElementById('content');
+				lines = text.value.split('\n');
+				for(i = 0; i < <?=$line?>; i++) {
+					if(i > 0) {
+						text.selectionStart += lines[i - 1].length + 1;
+					} else {
+						text.selectionStart = 0;
+					}
+					text.selectionEnd = text.selectionStart + lines[i].length;
+				}
+		</script>
+
 	</body>
 </html>
