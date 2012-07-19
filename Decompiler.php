@@ -236,7 +236,7 @@ class Decompiler {
 				$url = str_replace(".tpl", ".php", $url, &$count); 
 				if($count > 1) throw new Exception("Couldn't clean .tpl reference");
 				$vars = $this->printAnonymousDataArray($data, array('tpl', 'file'));
-				return '<?php $this->load->view(' . $url . ($vars !== 'null' ? '' : ', ' . $vars) . ') ?>';
+				return '<?php $this->load->view(' . $url . ($vars === 'null' ? '' : ', ' . $vars) . ') ?>';
 				
 			case 'include_js':
 				$this->stream->moveToWhitespace();
@@ -509,8 +509,12 @@ class Decompiler {
 						if($this->stream->readCharAhead(1) == '(') {
 							$this->stream->moveChar();
 							$this->stream->moveChar();
+							$return .= '(';
+							if($this->stream->getChar() !== ')') {
+								$return .= $this->cleanArgument();
+							}
 							$this->stream->expectChar(')');
-							$return .= '()';
+							$return .= ')';
 						} else {
 							$return = '@' . $return;
 						}
