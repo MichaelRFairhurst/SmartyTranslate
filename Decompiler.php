@@ -3,7 +3,7 @@
 class Decompiler {
 	
 	private $version = "Converted from Smarty-2.6.13 to PHP 5.3 by
-		SmartyTranslate v0.2.2 (created for this project)";
+		SmartyTranslate v0.2.3 (created for this project)";
 	
 	private $stream;
 	private $stack = array('');
@@ -236,7 +236,7 @@ class Decompiler {
 				$url = str_replace(".tpl", ".php", $url, &$count); 
 				if($count > 1) throw new Exception("Couldn't clean .tpl reference");
 				$vars = $this->printAnonymousDataArray($data, array('tpl', 'file'));
-				return '<?php $this->load->view(' . $url . ', ' . ($vars !== 'null' ? 'array_merge(get_defined_vars(), ' . $vars . ')' : 'get_defined_vars()') . ') ?>';
+				return '<?php $this->load->view(' . $url . ($vars !== 'null' ? '' : ', ' . $vars) . ') ?>';
 				
 			case 'include_js':
 				$this->stream->moveToWhitespace();

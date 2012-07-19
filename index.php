@@ -31,8 +31,10 @@ if(@$_REQUEST['content']) {
 	<body>
 		<?= isset($error) ? $error . '<br />' : '' ?>
 		<form method="POST">
-			<textarea rows='48' cols='170' id='content' name="content"><?=@htmlspecialchars($content)?></textarea>
+			<textarea rows='40' cols='150' id='content' name="content"><?=@htmlspecialchars($content)?></textarea>
 			<input type="submit" />
+			<br />
+			<a href="caveats.html">Maybe take a look at our caveats</a>
 		</form>
 		<script>
 				text = document.getElementById('content');
