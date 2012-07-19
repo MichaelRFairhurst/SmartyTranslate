@@ -11,6 +11,7 @@ class Decompiler {
 	private $widgetstack = array();
 	private $OPERATORS = array(	'eq' => '==',
 								'neq' => '!=',
+								'ne' => '!=',
 								'==' => '==',
 								'!=' => '!=',
 								'+' => '+',
