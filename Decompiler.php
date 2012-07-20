@@ -258,7 +258,8 @@ class Decompiler {
 			case 'html_select_state':
 				$this->stream->moveToWhitespace();
 				$data = $this->getParamVals();
-				return '<?php echo html_select_state(' . $data . '); ?>';
+				return '<?php echo html_select_state(' . printAnonymousDataArray($data) . '); ?>';
+	i
 
 			default:
 				throw new Exception('Unrecognized smarty tag: ' . $tag);
