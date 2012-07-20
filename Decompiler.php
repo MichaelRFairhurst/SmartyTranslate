@@ -255,6 +255,11 @@ class Decompiler {
 				if(!$url) throw new Exception('No url for include');
 				return '<?php echo STools::IncludeCSS(' . $url . (@$data['media'] ? ', ' . $data['media'] : '') . ') ?>';
 				
+			case 'html_select_state':
+				$this->stream->moveToWhitespace();
+				$data = $this->getParamVals();
+				return '<?php echo html_select_state(' . $data . '); ?>';
+
 			default:
 				throw new Exception('Unrecognized smarty tag: ' . $tag);
 				break;
