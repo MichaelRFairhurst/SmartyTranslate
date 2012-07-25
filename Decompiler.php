@@ -629,6 +629,9 @@ class Decompiler {
 			case 'default':
 				return '(' . $return . ') ? ' . $return . ' : ' . $elements['arguments'][0] . ')';
 	
+			case 'truncate':			
+				return 'STools::truncate(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
+
 			case 'f':
 			case 'func':
 				echo "test func called, ";

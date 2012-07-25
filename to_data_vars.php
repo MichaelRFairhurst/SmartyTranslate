@@ -124,7 +124,7 @@ while(true) {
 	switch($nextpos) {
 		case strpos($content, $assign, $nextpos):
 			$nextpos += $assignl;
-			$out .= '$_data[' . getToComma($content, &$nextpos) . '] = ';
+			$out .= '$this->_data[' . getToComma($content, &$nextpos) . '] = ';
 			$out .= getToCloseParen($content, &$nextpos);
 			$nextpos++;
 			break;
