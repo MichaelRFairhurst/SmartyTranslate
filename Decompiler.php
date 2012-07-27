@@ -25,7 +25,9 @@ class Decompiler {
 								'&&' => '&&',
 								'||' => '||',
 								'AND' => '&&',
+								'and' => '&&',
 								'OR' => '||',
+								'or' => '||',
 								'XOR' => '^',
 								'^' => '^',
 			);
@@ -617,6 +619,21 @@ class Decompiler {
 			case '':
 				return $return;
 
+			case 'date_format':
+				if(!$elements['method'] || !$elements['methodparens']) throw new Exception("Smarty date_format does not work like PHP's date_format.");
+				if(strtolower($elements['main']) == 'user') {
+					$return = 'Application::getUser()';
+				} else {
+					$return = '$' . $elements['main'];
+				}
+				if($elements['arguments']['0']) {
+					$innerformat = str_replace('%', '', $elements['arguments']['0']);
+				} else {
+					$innerformat = "'M j, Y'";
+				}
+
+				return $return . '->' . $elements['method'] . '('. $innerformat .')';
+
 			case 'cat':
 				if(count($elements['arguments']) > 1) throw new Exception("Only expected one argument to cat");
 				return $return . ' . ' . $elements['arguments'][0];
@@ -633,10 +650,17 @@ class Decompiler {
 			case 'truncate':
 				return 'STools::truncate(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
 
+			case 'format_ssn':
+				return 'STools::format_ssn(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
+
 			case 'f':
 			case 'func':
 				echo "test func called, ";
 				return $elements['funcname'] . '(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
+
+			case 'string_format':
+				$elements['funcname'] = "sprintf";
+				//no break
 
 			default:
 				if(!function_exists($elements['funcname'])) throw new Exception($elements['funcname'] . ' probably isn\'t a PHP function. Add to compiler and/or write a Stool.');
