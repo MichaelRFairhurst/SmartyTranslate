@@ -619,6 +619,9 @@ class Decompiler {
 			case '':
 				return $return;
 
+			case 'money_format':
+				return 'money_format(' . $elements['arguments'][0] . ', ' . $return . ')';
+
 			case 'date_format':
 				if(!$elements['method'] || !$elements['methodparens']) throw new Exception("Smarty date_format does not work like PHP's date_format.");
 				if(strtolower($elements['main']) == 'user') {
