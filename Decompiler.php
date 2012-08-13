@@ -665,6 +665,7 @@ class Decompiler {
 				$elements['funcname'] = "sprintf";
 				//no break
 
+			case 'format_phone':
 			default:
 				if(!function_exists($elements['funcname'])) throw new Exception($elements['funcname'] . ' probably isn\'t a PHP function. Add to compiler and/or write a Stool.');
 				return $elements['funcname'] . '(' . $return . (!empty($elements['arguments'][0]) ? ', ' . join($elements['arguments'], ', ') : '') . ')';
