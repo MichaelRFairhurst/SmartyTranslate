@@ -235,9 +235,9 @@ class Decompiler {
 			case 'include':
 				$this->stream->moveToWhitespace();
 				$data = $this->getParamVals();
-				$url = $this->quote(@$data['tpl'] ? @$data['tpl'] : @$data['file']);
+				$url = $this->quote(isset($data['tpl']) ? $data['tpl'] : $data['file']);
 				if(!$url) throw new Exception('No url for include');$count = 0;
-				$url = str_replace(".tpl", ".php", $url, &$count);
+				$url = str_replace(".tpl", ".php", $url, $count);
 				if($count > 1) throw new Exception("Couldn't clean .tpl reference");
 				$vars = $this->printAnonymousDataArray($data, array('tpl', 'file'));
 				return '<?php $this->load->view(' . $url . ($vars === 'null' ? '' : ', ' . $vars) . ') ?>';

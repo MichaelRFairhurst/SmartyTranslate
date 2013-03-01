@@ -1,11 +1,20 @@
 <?
 
+register_shutdown_function(function() {
+	$error = error_get_last();
+	if($error) {
+		$msg = $error['message'] . ' on ' . $error['file'] . ':' . $error['line'];
+		mail('mfairhurst@mediprodirect.com, cole@manifestwebdesign.com', 'error in smarty parser', $msg);
+	}
+}); 
+
 include('Stream.php');
 include('Decompiler.php');
 
 $line = 0;
+$content = null;
 
-if(@$_REQUEST['content']) {
+if(isset($_REQUEST['content'])) {
 	$st = new Stream($_REQUEST['content']);
 
 	$dc = new Decompiler($st);

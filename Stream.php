@@ -128,7 +128,7 @@ class Stream {
 	 */
 	function getChar() {
 		if($this->atEOF()) return self::EOF;
-		return @$this->data[$this->pointer];
+		return array_key_exists($this->pointer, $this->data) ? @$this->data[$this->pointer] : '';
 	}
 	
 	/**
