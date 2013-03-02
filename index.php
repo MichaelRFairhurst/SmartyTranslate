@@ -1,5 +1,8 @@
 <?
 
+// This makes prevents supressed errors with @ from being returned by error_get_last()
+set_error_handler(function($error) { return $error['type'] == 0; });
+
 register_shutdown_function(function() {
 	$error = error_get_last();
 	if($error) {
